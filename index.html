@@ -24,6 +24,29 @@
     </nav>
 
     <script>
+        // ฟังก์ชันสำหรับสลับหน้าจอ (ต้องมีฟังก์ชันนี้เพื่อให้หน้าเว็บทำงาน)
+function showPage(pageId) {
+    // 1. ซ่อนหน้าจอทั้งหมดก่อน
+    document.querySelectorAll('.page-content').forEach(page => {
+        page.classList.add('hidden');
+    });
+    
+    // 2. แสดงหน้าจอที่เลือก
+    const target = document.getElementById(pageId);
+    if (target) {
+        target.classList.remove('hidden');
+    }
+    
+    // 3. ถ้าเลือกหน้า 'form' ให้โหลดข้อมูล (ถ้ามี)
+    if(pageId === 'form') {
+        // เพิ่มคำสั่งดึงข้อมูล หรือเริ่มต้นหน้าฟอร์มที่นี่
+    }
+}
+
+// คำสั่งเริ่มทำงานเมื่อโหลดหน้าเว็บเสร็จ
+window.onload = () => {
+    showPage('form'); // สั่งให้โชว์หน้า 'form' เป็นหน้าแรก
+};
         
         // 1. CONFIG & API
         const SB_URL = "https://iocaoxoykxzcblxhpafj.supabase.co";
