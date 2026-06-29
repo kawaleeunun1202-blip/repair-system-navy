@@ -858,7 +858,10 @@ function exportToExcel() {
   document.body.removeChild(link);
 }
 
-        window.onload = () => showPage('form');
+       // เมื่อหน้าเว็บโหลดเสร็จ ให้เรียกฟังก์ชัน Page_Form
+  window.onload = () => {
+    Page_Form(); // สั่งให้ประกอบฟอร์มลงใน id="page-content"
+  };
     </script>
 </body>
 </html>
