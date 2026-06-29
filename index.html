@@ -231,12 +231,10 @@ async function handleFormSubmit(e) {
   btn.innerHTML = `ส่งข้อมูลใบแจ้งซ่อมเข้าระบบ <i class="fa-solid fa-paper-plane text-[10px] ml-1"></i>`;
 }
         
-     
 
-       // เมื่อหน้าเว็บโหลดเสร็จ ให้เรียกฟังก์ชัน Page_Form
-  window.onload = () => {
-    Page_Form(); // สั่งให้ประกอบฟอร์มลงใน id="page-content"
-  };
+window.onload = () => {
+    Page_Form(); // เริ่มต้นด้วยหน้าฟอร์ม
+};
     </script>
 </body>
 </html>
