@@ -59,12 +59,12 @@ window.onload = () => {
         async function deleteRepairJob(id) { const res = await fetch(`${SB_URL}/rest/v1/repairs?job_number=eq.${id}`, { method: 'DELETE', headers }); return { success: res.ok, message: res.ok ? "ลบสำเร็จ" : "Error" }; }
 
         // 2. PAGES
-        function showPage(p) {
-            if(p === 'form') Page_Form();
-            else if(p === 'history') Page_Tracking();
-            else if(p === 'analytics') Page_Analytics();
-            else if(p === 'technician') Page_Technician();
-        }
+  function showPage(p) {
+    if(p === 'form') Page_Form();
+    else if(p === 'history') Page_Tracking();
+    else if(p === 'analytics') Page_Analytics();
+    else if(p === 'technician') Page_Technician();
+}
 
         // โค้ด Page_Form----------------------------------------------------
      function Page_Form() {
@@ -232,9 +232,7 @@ async function handleFormSubmit(e) {
 }
         
 
-window.onload = () => {
-    Page_Form(); // เริ่มต้นด้วยหน้าฟอร์ม
-};
+
     </script>
 </body>
 </html>
