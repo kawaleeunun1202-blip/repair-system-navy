@@ -1,0 +1,166 @@
+// ==========================================
+// 📝 PAGE: Page_Form (หน้าต่างฟอร์มยื่นใบแจ้งซ่อม)
+// ==========================================
+function Page_Form() {
+  document.getElementById('page-content').innerHTML = `
+    <div class="app-card overflow-hidden bg-white shadow-sm border border-slate-200">
+      <div class="bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] p-5 text-white">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+            <i class="fa-solid fa-file-invoice text-sm text-slate-300"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold tracking-wide">แบบฟอร์มแจ้งซ่อม</h2>
+            <p class="text-[10px] text-slate-400 font-medium">กรุณาระบุรายละเอียดให้ครบถ้วนเพื่อความรวดเร็ว</p>
+          </div>
+        </div>
+      </div>
+
+      <form id="repairForm" onsubmit="handleFormSubmit(event)" class="p-5 text-xs space-y-4">
+        <div>
+          <label class="block font-bold text-slate-500 mb-1.5 uppercase tracking-wider">ระดับความเร่งด่วน</label>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="border-2 border-rose-200 bg-rose-50/50 text-rose-700 font-bold rounded-xl p-3 text-center cursor-pointer block transition shadow-sm">
+              <input type="radio" name="urgency" value="ด่วนมาก" class="mr-1" checked> 🚨 ด่วนมาก
+            </label>
+            <label class="border border-slate-200 bg-white text-slate-600 font-medium rounded-xl p-3 text-center cursor-pointer block transition hover:bg-slate-50">
+              <input type="radio" name="urgency" value="ด่วน" class="mr-1"> ⚠️ ด่วน
+            </label>
+            <label class="border border-slate-200 bg-white text-slate-600 font-medium rounded-xl p-3 text-center cursor-pointer block transition hover:bg-slate-50">
+              <input type="radio" name="urgency" value="ไม่ด่วน" class="mr-1"> ✅ ไม่ด่วน
+            </label>
+          </div>
+        </div>
+
+        <div class="space-y-3.5">
+          <div>
+            <label class="block font-bold text-slate-500 mb-1">เครื่องจักร / อุปกรณ์ที่ชำรุด</label>
+            <input type="text" id="subject" required class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition" placeholder="ระบุชื่อหรือรหัสอุปกรณ์">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-500 mb-1">รายละเอียดและอาการที่พบ</label>
+            <textarea id="description" rows="2" class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition" placeholder="ระบุอาการชำรุดเบื้องต้น..."></textarea>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-500 mb-1">สถานที่ / แผนก / อาคารติดตั้ง</label>
+            <input type="text" id="location" required class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition" placeholder="เช่น คลังสินค้าโซน B">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-500 mb-1">ชื่อผู้แจ้งซ่อม</label>
+              <input type="text" id="reporter_name" required class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-500 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+              <input type="tel" id="phone" required pattern="[0-9]{10}" class="w-full bg-[#f8fafc] border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition" placeholder="เลข 10 หลัก">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-500 mb-1">รูปถ่ายหลักฐานหน้างาน</label>
+          <div class="border-2 border-dashed border-slate-200 rounded-xl p-5 bg-[#f8fafc] text-center relative cursor-pointer hover:bg-slate-100/50 transition">
+            <input type="file" id="photo_before" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="compressAndPreview(event)">
+            <div id="uploadPlaceholder" class="text-slate-400">
+              <i class="fa-solid fa-cloud-arrow-up text-xl mb-1 text-slate-500"></i>
+              <p class="font-bold text-[11px] text-slate-600">กดที่นี่เพื่อเปิดกล้อง หรือ แนบรูปภาพ</p>
+              <p class="text-[9px] text-slate-400 mt-0.5">ระบบจะบีบอัดขนาดไฟล์ให้โดยอัตโนมัติ</p>
+            </div>
+            <div id="loadingStatus" class="hidden text-amber-600 font-bold text-[11px] py-2 animate-pulse">
+              <i class="fa-solid fa-circle-notch animate-spin mr-1"></i> กำลังบีบอัดรูปภาพโปรดรอสักครู่...
+            </div>
+            <img id="imgPreview" class="hidden max-h-40 mx-auto rounded-lg shadow-md border border-white">
+          </div>
+        </div>
+
+        <button type="submit" id="btnSubmit" class="w-full bg-[#0f172a] hover:bg-slate-800 text-white font-bold p-3.5 rounded-xl shadow-md mt-5 transition-all active:scale-[0.99] text-xs uppercase tracking-wider">
+          ส่งข้อมูลใบแจ้งซ่อมเข้าระบบ <i class="fa-solid fa-paper-plane text-[10px] ml-1"></i>
+        </button>
+      </form>
+    </div>
+  `;
+}
+
+// ==========================================
+// ⚙️ SYSTEM LOGIC FOR FORM SUBMISSION
+// ==========================================
+var currentBase64 = "";
+var isCompressing = false;
+
+function compressAndPreview(event) {
+  const file = event.target.files[0];
+  if (file) {
+    isCompressing = true;
+    document.getElementById('uploadPlaceholder').classList.add('hidden');
+    document.getElementById('imgPreview').classList.add('hidden');
+    document.getElementById('loadingStatus').classList.remove('hidden');
+    document.getElementById('btnSubmit').disabled = true;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const max_width = 450; 
+        const scale = max_width / img.width;
+        canvas.width = max_width;
+        canvas.height = img.height * scale;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        currentBase64 = canvas.toDataURL('image/jpeg', 0.4); 
+        
+        document.getElementById('imgPreview').src = currentBase64;
+        document.getElementById('imgPreview').classList.remove('hidden');
+        document.getElementById('loadingStatus').classList.add('hidden');
+        document.getElementById('btnSubmit').disabled = false;
+        isCompressing = false;
+      }
+    }
+    reader.readAsDataURL(file);
+  }
+}
+
+// 🔄 ฟังก์ชันกดยื่นฟอร์มที่ย้ายมายิงตรงหา Supabase แทน GAS ลัดขั้นตอน
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  if (isCompressing) {
+    alert("⚠️ ระบบกำลังประมวลผลรูปภาพ กรุณารอสักครู่แล้วกดส่งอีกครั้งครับ");
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-1"></i> กำลังส่งข้อมูลเข้า Supabase...`;
+
+  const payload = {
+    urgency: document.querySelector('input[name="urgency"]:checked').value,
+    subject: document.getElementById('subject').value,
+    description: document.getElementById('description').value,
+    location: document.getElementById('location').value,
+    reporter_name: document.getElementById('reporter_name').value,
+    phone: document.getElementById('phone').value,
+    photo_before: currentBase64 || null
+  };
+
+  // เรียกใช้ฟังก์ชันที่ทำไว้ในเลย์เอาท์หลัก
+  const result = await submitRepair(payload);
+  
+  if(result.success) {
+    alert(result.message);
+    document.getElementById('repairForm').reset();
+    document.getElementById('imgPreview').classList.add('hidden');
+    document.getElementById('uploadPlaceholder').classList.remove('hidden');
+    currentBase64 = "";
+  } else {
+    alert("เกิดข้อผิดพลาดจากระบบ: " + result.message);
+  }
+  btn.disabled = false;
+  btn.innerHTML = `ส่งข้อมูลใบแจ้งซ่อมเข้าระบบ <i class="fa-solid fa-paper-plane text-[10px] ml-1"></i>`;
+}
