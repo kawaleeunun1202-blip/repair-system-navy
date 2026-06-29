@@ -1,0 +1,101 @@
+// ==========================================
+// 📊 PAGE: Page_Analytics (หน้าต่างแดชบอร์ดสรุปสถิติภาพรวม)
+// ==========================================
+function Page_Analytics() {
+  document.getElementById('page-content').innerHTML = `
+    <div class="space-y-4">
+      <div class="px-1">
+        <h2 class="text-sm font-bold text-slate-500 tracking-wide">ภาพรวมข้อมูลการแจ้งซ่อม</h2>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+        <select id="monthFilter" onchange="calcAnalytics()" class="w-full bg-[#f8fafc] border border-slate-200 rounded-lg p-2.5 text-xs font-medium text-slate-700 focus:outline-none">
+          <option value="All">สรุปสถิติภาพรวมทั้งหมด (ปี 2026)</option>
+          <option value="0">มกราคม</option>
+          <option value="1">กุมภาพันธ์</option>
+          <option value="2">มีนาคม</option>
+          <option value="3">เมษายน</option>
+          <option value="4">พฤษภาคม</option>
+          <option value="5">มิถุนายน</option>
+          <option value="6">กรกฎาคม</option>
+          <option value="7">สิงหาคม</option>
+          <option value="8">กันยายน</option>
+          <option value="9">ตุลาคม</option>
+          <option value="10">พฤศจิกายน</option>
+          <option value="11">ธันวาคม</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-[#0f172a] text-white p-4 rounded-xl shadow-md flex flex-col justify-between min-h-[100px] border border-slate-800">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-medium text-slate-300">งานแจ้งซ่อมทั้งหมด</span>
+            <i class="fa-solid fa-list-check text-slate-400 text-sm"></i>
+          </div>
+          <h3 class="text-3xl font-bold mt-2 tracking-tight" id="totalTasks">0</h3>
+        </div>
+        
+        <div class="bg-white border border-slate-200 p-4 rounded-xl flex flex-col justify-between min-h-[100px] shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-medium text-slate-500">รอดำเนินการ / กำลังซ่อม</span>
+            <div class="w-6 h-6 bg-amber-50 rounded-md flex items-center justify-center text-amber-600 text-xs border border-amber-100">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+          </div>
+          <h3 class="text-3xl font-bold mt-2 text-slate-800 tracking-tight" id="pendingTasks">0</h3>
+        </div>
+
+        <div class="bg-white border border-slate-200 p-4 rounded-xl col-span-2 flex items-center justify-between shadow-sm">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full border-4 border-[#0f172a] border-t-slate-200 flex items-center justify-center text-[9px] font-black text-[#0f172a] animate-pulse">
+              KPI
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-slate-800 tracking-tight" id="successRate">0%</h3>
+              <p class="text-[11px] text-slate-400 font-medium">อัตราการปิดงานสำเร็จ (Success Rate)</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // เรียกโหลดฐานข้อมูล Supabase เพื่อนำมาทำแดชบอร์ดทันที
+  loadAnalytics();
+}
+
+// ==========================================
+// ⚙️ SYSTEM LOGIC FOR ANALYTICS SCREEN
+// ==========================================
+if (typeof rawAnalyticsData === 'undefined') { var rawAnalyticsData = []; }
+
+// 🔄 ดึงข้อมูลความเคลื่อนไหวจากส่วนกลางโดยยิงผ่าน Supabase Fetch
+async function loadAnalytics() {
+  const data = await getRepairs();
+  rawAnalyticsData = data || [];
+  calcAnalytics();
+}
+
+function calcAnalytics() {
+  const filterEl = document.getElementById('monthFilter');
+  if (!filterEl) return; // ป้องกันข้อผิดพลาดกรณีสลับหน้าจอไปมา
+  
+  const selectedMonth = filterEl.value;
+  let filtered = rawAnalyticsData.filter(item => {
+    if (selectedMonth === 'All') return true;
+    
+    // 🌟 รองรับตรวจสอบข้อมูลผ่านคอลัมน์ created_at ของ Supabase
+    if (!item.created_at) return false;
+    return new Date(item.created_at).getMonth() == selectedMonth;
+  });
+
+  const total = filtered.length;
+  const pending = filtered.filter(i => i.status === 'Pending' || i.status === 'In-Progress').length;
+  const completed = filtered.filter(i => i.status === 'Completed').length;
+  const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  document.getElementById('totalTasks').innerText = total;
+  document.getElementById('pendingTasks').innerText = pending;
+  document.getElementById('successRate').innerText = rate + '%';
+}
