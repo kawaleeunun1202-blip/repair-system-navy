@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { 
+      font-family: 'Prompt', sans-serif; 
+      background-color: #f8fafc; /* พื้นหลังออฟไวท์อ่อนๆ สบายตา */
+      color: #1e293b; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    .app-card { 
+      background: #ffffff; 
+      border-radius: 16px; 
+      border: 1px solid #e2e8f0; 
+    }
+    /* 🌟 ปรับสีปุ่มเมนูด้านล่างตอนเลือกใช้งาน ให้เป็นโทนสีกรมท่าพรีเมียม */
+    .active-nav { 
+      color: #0f172a !important; /* สีกรมท่าเข้มจัด */
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-28">
+
+  <header class="bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] text-white p-4 sticky top-0 z-50 flex items-center justify-between px-5 shadow-md border-b border-slate-800">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-white">
+        <i class="fa-solid fa-screwdriver-wrench text-sm text-slate-300"></i>
+      </div>
+      <div>
+        <h1 class="text-xs font-medium text-slate-400 tracking-wider uppercase">ระบบแจ้งซ่อมออนไลน์</h1>
+        <p class="text-sm font-bold text-white -mt-0.5">หน่วยงานธุรการ โรงงานระยอง</p>
+      </div>
+    </div>
+  </header>
+
+  <main id="app-container" class="container mx-auto p-4 max-w-md">
+    <div id="page-content"></div>
+  </main>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around items-center py-2 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] z-50">
+    <button onclick="switchPage('Page_Form', this)" class="nav-btn flex flex-col items-center text-slate-400 py-1 px-4 transition-all active-nav">
+      <i class="fa-solid fa-file-pen text-lg mb-0.5"></i>
+      <span class="text-[11px]">ยื่นใบแจ้ง</span>
+    </button>
+    <button onclick="switchPage('Page_Tracking', this)" class="nav-btn flex flex-col items-center text-slate-400 py-1 px-4 transition-all">
+      <i class="fa-solid fa-clock-rotate-left text-lg mb-0.5"></i>
+      <span class="text-[11px]">ประวัติงาน</span>
+    </button>
+    <button onclick="switchPage('Page_Analytics', this)" class="nav-btn flex flex-col items-center text-slate-400 py-1 px-4 transition-all">
+      <i class="fa-solid fa-chart-pie text-lg mb-0.5"></i>
+      <span class="text-[11px]">แดชบอร์ด</span>
+    </button>
+    <button onclick="switchPage('Page_Technician', this)" class="nav-btn flex flex-col items-center text-slate-400 py-1 px-4 transition-all">
+      <i class="fa-solid fa-user-gear text-lg mb-0.5"></i>
+      <span class="text-[11px]">ช่างซ่อม</span>
+    </button>
+  </nav>
+
+  <script>
+    // 🌐 ตั้งค่าการเชื่อมต่อ Supabase ส่วนกลางเพื่อส่งต่อไปยังหน้าย่อยต่างๆ
+    const SB_URL = "https://iocaoxoykxzcblxhpafj.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvY2FveG95a3h6Y2JseGhwYWZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTY4ODIsImV4cCI6MjA5ODIzMjg4Mn0.cUpGex11UtY6sYvxhKqIF3vMPRL7sn2dC3gicjHNyy8";
+    const SB_HEADERS = {
+      "apikey": SB_KEY,
+      "Authorization": `Bearer ${SB_KEY}`,
+      "Content-Type": "application/json"
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // โหลดหน้าแรกเมื่อเปิดแอป
+      switchPage('Page_Form', document.querySelectorAll('.nav-btn')[0]);
+    });
+
+    // ฟังก์ชันสำหรับสลับหน้าแอป (เวอร์ชันสำหรับ GitHub Pages)
+    function switchPage(pageName, btnElement) {
+      // แสดงตัวโหลด Spinner สีกรมท่าระหว่างรอเปลี่ยนหน้า
+      document.getElementById('page-content').innerHTML = `
+        <div class="flex flex-col items-center justify-center py-24 text-slate-400">
+          <div class="w-7 h-7 border-3 border-[#0f172a] border-t-transparent rounded-full animate-spin mb-2"></div>
+          <p class="text-xs text-slate-500 font-medium">กำลังเปิดหน้าต่าง...</p>
+        </div>
+      `;
+      
+      // สลับแท็บสถานะ Active ของปุ่มที่เมนูด้านล่าง
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav'));
+      if(btnElement) btnElement.classList.add('active-nav');
+      
+      // เรียกฟังก์ชันโหลดหน้าย่อย (จะทะยอยสร้างฟังก์ชันเหล่านี้ประกอบเข้าไปในขั้นตอนถัดไปครับ)
+      if (typeof window[pageName] === 'function') {
+         window[pageName]();
+      } else {
+         // ตัวจัดการกรณีที่ยังไม่ได้ใส่โค้ดหน้าย่อยนั้นๆ ลงไปในระบบ
+         document.getElementById('page-content').innerHTML = `
+           <div class="text-center py-12 text-slate-400 app-card p-6">
+             <i class="fa-solid fa-hourglass-start text-xl text-slate-300 mb-2 block"></i>
+             <p class="text-xs font-medium">รอการประกอบโค้ดหน้า <b>${pageName}</b> เข้าสู่ไฟล์หลัก</p>
+           </div>
+         `;
+      }
+    }
+  </script>
+</body>
+</html>
