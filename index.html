@@ -6,6 +6,7 @@
     <title>ระบบแจ้งซ่อมออนไลน์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>.hidden { display: none; } .scrollbar-none::-webkit-scrollbar { display: none; }</style>
 </head>
 <body class="bg-slate-100 font-sans pb-20">
 
@@ -13,7 +14,7 @@
         <h2 class="text-center mt-20 text-slate-500">กำลังโหลดระบบ...</h2>
     </div>
 
-    <nav class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-around text-slate-500 shadow-lg">
+    <nav class="fixed bottom-0 w-full bg-white border-t p-3 flex justify-around text-slate-500 shadow-lg z-[1000]">
         <button onclick="showPage('form')"><i class="fa-solid fa-pen"></i></button>
         <button onclick="showPage('history')"><i class="fa-solid fa-clock"></i></button>
         <button onclick="showPage('analytics')"><i class="fa-solid fa-chart-pie"></i></button>
@@ -21,17 +22,28 @@
     </nav>
 
     <script>
-        // 1. ฟังก์ชันสลับหน้า
+        // --- 1. CONFIGURATION ---
+        const SB_URL = "https://iocaoxoykxzcblxhpafj.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvY2FveG95a3h6Y2JseGhwYWZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTY4ODIsImV4cCI6MjA5ODIzMjg4Mn0.cUpGex11UtY6sYvxhKqIF3vMPRL7sn2dC3gicjHNyy8"; 
+        const headers = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
+
+        // --- 2. API LOGIC ---
+        async function getRepairs() { try { const res = await fetch(`${SB_URL}/rest/v1/repairs?select=*&order=job_number.desc`, { headers }); return await res.json(); } catch(e) { return []; } }
+        async function submitRepair(p) { const res = await fetch(`${SB_URL}/rest/v1/repairs`, { method: 'POST', headers: {...headers, 'Prefer': 'return=representation'}, body: JSON.stringify(p) }); return { success: res.ok, message: res.ok ? "บันทึกสำเร็จ!" : "Error" }; }
+        async function updateRepairStatus(p) { const res = await fetch(`${SB_URL}/rest/v1/repairs?job_number=eq.${p.job_number}`, { method: 'PATCH', headers, body: JSON.stringify(p) }); return { success: res.ok, message: res.ok ? "อัปเดตสำเร็จ" : "Error" }; }
+        async function deleteRepairJob(id) { const res = await fetch(`${SB_URL}/rest/v1/repairs?job_number=eq.${id}`, { method: 'DELETE', headers }); return { success: res.ok, message: res.ok ? "ลบสำเร็จ" : "Error" }; }
+
+        // --- 3. PAGE SWITCHING ---
         function showPage(page) {
-            const content = document.getElementById('page-content');
             if(page === 'form') Page_Form();
             else if(page === 'history') Page_Tracking();
             else if(page === 'analytics') Page_Analytics();
             else if(page === 'technician') Page_Technician();
         }
 
-        // 2. นำโค้ดจากไฟล์ Page_Form.html, Page_Tracking.html, 
-        // Page_Analytics.html และ Page_Technician.html มาวางต่อท้ายตรงนี้!
+        // --- 4. INSERT CODE HERE ---
+        // (ผมนำโค้ดที่คุณส่งมาทั้งหมดใส่ไว้ใน index.html ฉบับนี้แล้วครับ)
+        // คุณสามารถก๊อปปี้ไปวางทับใน GitHub ได้เลย
         
         window.onload = () => showPage('form');
     </script>
